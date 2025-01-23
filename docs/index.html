@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿龙哥双色球预测系统</title>
+    <script src="https://unpkg.com/brain.js"></script>
+    <style>
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .prediction-box {
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      .numbers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+        gap: 10px;
+      }
+
+      .red-balls,
+      .blue-ball {
+        display: flex;
+        gap: 10px;
+      }
+
+      .ball {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+      }
+
+      .red {
+        background-color: #ff4444;
+      }
+
+      .blue {
+        background-color: #4444ff;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 10px;
+      }
+
+      button:hover {
+        background-color: #1976D2;
+      }
+
+      .history {
+        margin-top: 20px;
+        text-align: left;
+        padding: 20px;
+      }
+
+      .stats {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+      }
+
+      .prediction-group {
+        margin: 15px 0;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+      }
+
+      .prediction-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .time-display {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+        color: #333;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="time-display" id="currentTime"></div>
+      <h1>阿龙哥双色球预测系统</h1>
+      <div class="prediction-box">
+        <h2>预测结果</h2>
+        <div id="predictions">
+          <!-- 这里会显示5组预测结果 -->
+        </div>
+        <button onclick="predictMultiple(5)">生成5组预测号码</button>
+        <button onclick="showStats()">显示统计信息</button>
+      </div>
+      <div id="stats" class="stats"></div>
+    </div>
+
+    <script src="https://unpkg.com/brain.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+
+</html>
