@@ -11,13 +11,52 @@ async function loadHistoryData() {
   } catch (error) {
     console.error('加载历史数据失败:', error);
     // 如果加载失败，返回一些示例数据
-    return [
-      [2, 9, 12, 19, 21, 31, 4],
-      [6, 10, 11, 18, 20, 32, 5],
-      [1, 3, 4, 11, 12, 21, 16],
-      // ... 可以添加更多示例数据
-    ];
+    return [];
   }
+}
+
+function showStats() {
+  // 获取历史数据
+  const historyData = JSON.parse(localStorage.getItem('predictionHistory') || '[]');
+
+  // 如果没有历史数据
+  if (historyData.length === 0) {
+    document.getElementById('stats').innerHTML = '<p>暂无预测历史数据</p>';
+    return;
+  }
+
+  // 统计红球和蓝球出现的频率
+  const redBallStats = {};
+  const blueBallStats = {};
+
+  historyData.forEach(prediction => {
+    prediction.redBalls.forEach(num => {
+      redBallStats[num] = (redBallStats[num] || 0) + 1;
+    });
+    blueBallStats[prediction.blueBall] = (blueBallStats[prediction.blueBall] || 0) + 1;
+  });
+
+  // 生成统计信息的HTML
+  let statsHTML = `
+      <h3>统计信息</h3>
+      <p>共生成 ${historyData.length} 组预测号码</p>
+      <div>
+          <h4>红球出现频率：</h4>
+          <p>${Object.entries(redBallStats)
+      .sort((a, b) => b[1] - a[1])
+      .map(([num, count]) => `${num}号：${count}次`)
+      .join('， ')}
+          </p>
+          <h4>蓝球出现频率：</h4>
+          <p>${Object.entries(blueBallStats)
+      .sort((a, b) => b[1] - a[1])
+      .map(([num, count]) => `${num}号：${count}次`)
+      .join('， ')}
+          </p>
+      </div>
+  `;
+
+  document.getElementById('stats').innerHTML = statsHTML;
 }
 
 // 准备训练数据
