@@ -166,12 +166,21 @@ function predictMultiple(count) {
   predictionsDiv.innerHTML = '';
 
   let lastPrediction = null;
+  const predictions = []; // 存储本次生成的所有预测
+
   for (let i = 0; i < count; i++) {
     // 第一组使用随机预测，后续组基于前一组预测
     const prediction = i === 0 ? predictRandom() : predictNextNumbers(
       [...lastPrediction.red, lastPrediction.blue]
     );
     lastPrediction = prediction;
+
+    // 保存预测结果
+    predictions.push({
+      redBalls: prediction.red,
+      blueBall: prediction.blue,
+      timestamp: new Date().getTime()
+    });
 
     const predictionGroup = document.createElement('div');
     predictionGroup.className = 'prediction-group';
@@ -205,13 +214,123 @@ function predictMultiple(count) {
     predictionGroup.appendChild(numbers);
     predictionsDiv.appendChild(predictionGroup);
   }
+
+  // 保存到 localStorage
+  const existingPredictions = JSON.parse(localStorage.getItem('predictions') || '[]');
+  localStorage.setItem('predictions', JSON.stringify([...existingPredictions, ...predictions]));
 }
 
 // 显示统计信息
 function showStats() {
-  const statsDiv = document.getElementById('stats');
-  statsDiv.innerHTML = '统计信息将在这里显示';
-  // 这里可以添加更详细的统计信息
+  // 获取统计区域元素
+  const statsDiv = document.querySelector('.stats');
+  const statsContent = document.getElementById('stats');
+
+  // 切换显示状态
+  if (statsDiv.style.display === 'none' || !statsDiv.style.display) {
+    statsDiv.style.display = 'block';
+
+    // 清空现有内容
+    statsContent.innerHTML = '';
+
+    // 生成统计信息
+    const stats = calculateStats();
+    displayStats(stats, statsContent);
+  } else {
+    statsDiv.style.display = 'none';
+  }
+}
+
+function calculateStats() {
+  const predictions = JSON.parse(localStorage.getItem('predictions') || '[]');
+
+  // 初始化统计对象
+  const stats = {
+    redBalls: Array(33).fill(0),
+    blueBalls: Array(16).fill(0),
+    oddEvenRatio: { odd: 0, even: 0 },
+    sumRange: { min: 0, max: 0, avg: 0 }
+  };
+
+  if (predictions.length === 0) {
+    return stats;
+  }
+
+  let totalSum = 0;
+
+  predictions.forEach(pred => {
+    // 统计红球
+    pred.redBalls.forEach(num => {
+      stats.redBalls[num - 1]++;
+      if (num % 2 === 0) {
+        stats.oddEvenRatio.even++;
+      } else {
+        stats.oddEvenRatio.odd++;
+      }
+    });
+
+    // 统计蓝球
+    stats.blueBalls[pred.blueBall - 1]++;
+
+    // 计算当前预测的红球和值
+    const sum = pred.redBalls.reduce((a, b) => a + b, 0);
+    totalSum += sum;
+
+    // 更新最大最小值
+    if (stats.sumRange.min === 0 || sum < stats.sumRange.min) {
+      stats.sumRange.min = sum;
+    }
+    if (sum > stats.sumRange.max) {
+      stats.sumRange.max = sum;
+    }
+  });
+
+  // 计算平均值
+  stats.sumRange.avg = totalSum / predictions.length;
+
+  return stats;
+}
+
+function displayStats(stats, container) {
+  // 显示红球频率
+  const redBallsStats = document.createElement('div');
+  redBallsStats.className = 'stat-item';
+  redBallsStats.innerHTML = `
+    <h3>红球出现频率</h3>
+    <p>${stats.redBalls.map((count, index) =>
+    `${index + 1}号：${count}次`).join(' | ')}</p>
+  `;
+  container.appendChild(redBallsStats);
+
+  // 显示蓝球频率
+  const blueBallsStats = document.createElement('div');
+  blueBallsStats.className = 'stat-item';
+  blueBallsStats.innerHTML = `
+    <h3>蓝球出现频率</h3>
+    <p>${stats.blueBalls.map((count, index) =>
+    `${index + 1}号：${count}次`).join(' | ')}</p>
+  `;
+  container.appendChild(blueBallsStats);
+
+  // 显示奇偶比例
+  const oddEvenStats = document.createElement('div');
+  oddEvenStats.className = 'stat-item';
+  oddEvenStats.innerHTML = `
+    <h3>奇偶比例</h3>
+    <p>奇数：${stats.oddEvenRatio.odd} | 偶数：${stats.oddEvenRatio.even}</p>
+  `;
+  container.appendChild(oddEvenStats);
+
+  // 显示和值范围
+  const sumStats = document.createElement('div');
+  sumStats.className = 'stat-item';
+  sumStats.innerHTML = `
+    <h3>红球和值统计</h3>
+    <p>最小值：${stats.sumRange.min}</p>
+    <p>最大值：${stats.sumRange.max}</p>
+    <p>平均值：${stats.sumRange.avg.toFixed(2)}</p>
+  `;
+  container.appendChild(sumStats);
 }
 
 // 显示当前时间
