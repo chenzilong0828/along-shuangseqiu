@@ -10,7 +10,6 @@ mkdir docs
 :: 复制必要文件到 docs 目录
 xcopy /s /y public\* docs\
 copy lottery-data.json docs\
-copy src\fetch-lottery-data.js docs\
 
 :: Git 命令
 git add .
